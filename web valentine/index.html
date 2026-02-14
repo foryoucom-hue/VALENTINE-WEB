@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valentine's Quiz - Untuk Kamu yang Tersayang ❤️</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', 'Segoe UI', sans-serif;
+            overflow-x: hidden;
+            background: #0f0c29;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Stars Background */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .welcome-screen, .quiz-screen, .result-screen, .love-letter-screen {
+            text-align: center;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .quiz-screen, .result-screen, .love-letter-screen {
+            display: none;
+        }
+
+        h1 {
+            font-size: 4.5rem;
+            background: linear-gradient(45deg, #ff6b9d, #ffc3a0, #ff6b9d);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 3s ease infinite;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 30px rgba(255, 107, 157, 0.6));
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .subtitle {
+            font-size: 1.8rem;
+            color: #ffc3a0;
+            margin-bottom: 50px;
+            text-shadow: 0 0 20px rgba(255, 195, 160, 0.5);
+        }
+
+        .main-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 1.8rem;
+            padding: 20px 50px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.5);
+            transition: all 0.4s ease;
+            font-weight: bold;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-btn:before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .main-btn:hover:before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .main-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 50px rgba(102, 126, 234, 0.7);
+        }
+
+        .main-btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Quiz Card */
+        .quiz-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 50px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b9d, #ffc3a0);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 20px rgba(255, 107, 157, 0.8);
+        }
+
+        .question-number {
+            font-size: 1.2rem;
+            color: #ffc3a0;
+            margin-bottom: 20px;
+        }
+
+        .question-text {
+            font-size: 2rem;
+            color: #fff;
+            margin-bottom: 40px;
+            line-height: 1.5;
+        }
+
+        .options {
+            display: grid;
+            gap: 20px;
+        }
+
+        .option-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 107, 157, 0.5);
+            color: white;
+            font-size: 1.3rem;
+            padding: 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .option-btn:hover {
+            background: rgba(255, 107, 157, 0.3);
+            border-color: #ff6b9d;
+            transform: translateX(10px);
+        }
+
+        .option-btn.correct {
+            background: rgba(76, 175, 80, 0.3);
+            border-color: #4CAF50;
+            animation: pulse 0.5s;
+        }
+
+        .option-btn.wrong {
+            background: rgba(244, 67, 54, 0.3);
+            border-color: #F44336;
+            animation: shake 0.5s;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        /* Result Screen */
+        .result-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 50px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .score-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 30px auto;
+            box-shadow: 0 0 50px rgba(102, 126, 234, 0.8);
+            animation: rotateGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes rotateGlow {
+            0%, 100% { box-shadow: 0 0 50px rgba(102, 126, 234, 0.8); }
+            50% { box-shadow: 0 0 80px rgba(255, 107, 157, 1); }
+        }
+
+        .score-text {
+            font-size: 4rem;
+            color: white;
+            font-weight: bold;
+        }
+
+        .result-message {
+            font-size: 2rem;
+            color: #ffc3a0;
+            margin: 30px 0;
+        }
+
+        .result-description {
+            font-size: 1.3rem;
+            color: #fff;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+
+        /* Love Letter Screen */
+        .love-letter-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(25px);
+            border-radius: 30px;
+            padding: 60px;
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.6);
+            border: 3px solid rgba(255, 107, 157, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .love-letter-card:before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 107, 157, 0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .letter-header {
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        .letter-header h2 {
+            font-size: 3rem;
+            color: #fff;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(255, 107, 157, 0.6);
+        }
+
+        .letter-to {
+            font-size: 1.5rem;
+            color: #ffc3a0;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+
+        .letter-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .letter-paragraph {
+            font-size: 1.4rem;
+            color: #fff;
+            line-height: 2;
+            margin-bottom: 25px;
+            text-align: left;
+            opacity: 0;
+            animation: fadeInUp 1s ease forwards;
+        }
+
+        .letter-paragraph:nth-child(1) { animation-delay: 0.3s; }
+        .letter-paragraph:nth-child(2) { animation-delay: 0.6s; }
+        .letter-paragraph:nth-child(3) { animation-delay: 0.9s; }
+        .letter-paragraph:nth-child(4) { animation-delay: 1.2s; }
+        .letter-paragraph:nth-child(5) { animation-delay: 1.5s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .signature {
+            font-size: 2rem;
+            color: #ff6b9d;
+            font-family: 'Brush Script MT', cursive;
+            margin-top: 40px;
+            text-align: right;
+            animation: fadeInUp 1s ease 1.8s forwards;
+            opacity: 0;
+        }
+
+        .heart-decoration {
+            font-size: 3rem;
+            margin: 30px 0;
+            animation: heartbeat 1.5s ease infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.1); }
+            50% { transform: scale(1); }
+            75% { transform: scale(1.1); }
+        }
+
+        /* Floating Hearts */
+        .heart {
+            position: fixed;
+            font-size: 2rem;
+            animation: floatUp 4s ease-in-out infinite;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.8;
+            }
+            90% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .rose-petals {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: rgba(255, 107, 157, 0.7);
+            border-radius: 50% 0;
+            animation: fallDown 5s linear infinite;
+        }
+
+        @keyframes fallDown {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 3rem;
+            }
+            .subtitle {
+                font-size: 1.3rem;
+            }
+            .quiz-card, .result-card, .love-letter-card {
+                padding: 30px 20px;
+            }
+            .question-text {
+                font-size: 1.5rem;
+            }
+            .option-btn {
+                font-size: 1.1rem;
+            }
+            .letter-paragraph {
+                font-size: 1.2rem;
+            }
+            .letter-header h2 {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+
+    <div class="container">
+        <!-- Welcome Screen -->
+        <div class="welcome-screen" id="welcomeScreen">
+            <h1>💖 Valentine's Quiz 💖</h1>
+            <p class="subtitle">Buktikan seberapa romantis kamu! ✨</p>
+            <button class="main-btn" onclick="startQuiz()">
+                <span>Mulai Quiz! 🎯</span>
+            </button>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div class="quiz-screen" id="quizScreen">
+            <div class="quiz-card">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressBar"></div>
+                </div>
+                <div class="question-number" id="questionNumber"></div>
+                <div class="question-text" id="questionText"></div>
+                <div class="options" id="options"></div>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div class="result-screen" id="resultScreen">
+            <div class="result-card">
+                <h1>🎉 Hasil Quiz! 🎉</h1>
+                <div class="score-circle">
+                    <div class="score-text" id="scoreText"></div>
+                </div>
+                <div class="result-message" id="resultMessage"></div>
+                <div class="result-description" id="resultDescription"></div>
+                <button class="main-btn" onclick="showLoveLetter()">
+                    <span>Lihat Pesan Spesial 💌</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Love Letter Screen -->
+        <div class="love-letter-screen" id="loveLetterScreen">
+            <div class="love-letter-card">
+                <div class="letter-header">
+                    <h2>SURAT CINTA UNTUK CELIAA</h2>
+                    <div class="letter-to">Untuk my bebeb</div>
+                </div>
+                
+                <div class="letter-content">
+                    <p class="letter-paragraph">
+                        Sayang, di hari Valentine ini, aku ingin kamu tahu betapa istimewanya kamu di hidupku. 
+                        Kamu bukan hanya pasangan, tapi juga sahabat terbaik yang selalu ada untukku.
+                    </p>
+                    
+                    <p class="letter-paragraph">
+                        Setiap detik bersamamu adalah kenangan berharga yang akan selalu kuingat. 
+                        Senyummu adalah cahaya yang menerangi hari-hariku, dan tawamu adalah musik terindah 
+                        yang pernah kudengar.
+                    </p>
+                    
+                    <p class="letter-paragraph">
+                        Aku bakal berusaha akan selalu ada untukmu, di saat senang maupun sedih. 
+                        Aku akan terus berusaha menjadi yang terbaik untukmu, karena kamu layak mendapatkan 
+                        semua kebahagiaan di dunia ini.
+                    </p>
+                    
+                    <div class="heart-decoration">💕 💖 💗 💓 💝</div>
+                    
+                    <p class="letter-paragraph">
+                        Terima kasih sudah menjadi bagian dari hidupku. Terima kasih sudah menerima aku apa adanya. 
+                        Terima kasih untuk setiap momen indah yang kita lalui bersama.
+                    </p>
+                    
+                    <p class="letter-paragraph" style="font-size: 1.8rem; font-weight: bold; text-align: center; color: #ff6b9d;">
+                        Aku mencintaimu lebih dari yang bisa kata-kata ungkapkan ❤️
+                    </p>
+                    
+                    <div class="signature">
+                        ~ Dengan cinta, untuk selalu ~
+                    </div>
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <button class="main-btn" onclick="resetQuiz()">
+                    <span>Main Lagi 🔄</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "Apa hadiah Valentine terbaik yang bisa kamu berikan?",
+                options: [
+                    "Waktu dan perhatian yang berkualitas ❤️",
+                    "Hadiah mahal dan mewah 💎",
+                    "Coklat dan bunga 🌹",
+                    "Posting di social media 📱"
+                ],
+                correct: 0
+            },
+            {
+                question: "Kencan Valentine yang paling romantis adalah?",
+                options: [
+                    "Nonton film di bioskop 🎬",
+                    "Makan malam mewah di restoran 🍽️",
+                    "Piknik di bawah bintang sambil ngobrol 🌙",
+                    "Party besar dengan banyak orang 🎉"
+                ],
+                correct: 2
+            },
+            {
+                question: "Apa arti sebenarnya dari Valentine's Day?",
+                options: [
+                    "Hari untuk pamer pasangan 📸",
+                    "Hari untuk merayakan cinta dan kasih sayang 💕",
+                    "Hari belanja hadiah 🛍️",
+                    "Hari libur biasa aja 📅"
+                ],
+                correct: 1
+            },
+            {
+                question: "Hal terpenting dalam hubungan adalah?",
+                options: [
+                    "Uang dan status 💰",
+                    "Penampilan fisik 👗",
+                    "Komunikasi dan kepercayaan 💬",
+                    "Hadiah dan kejutan 🎁"
+                ],
+                correct: 2
+            },
+            {
+                question: "Cara terbaik menunjukkan cinta setiap hari?",
+                options: [
+                    "Memberi hadiah setiap hari 🎁",
+                    "Mendengarkan dan mendukung pasangan 🤝",
+                    "Selalu posting foto berdua 📷",
+                    "Mengikuti semua keinginannya 👍"
+                ],
+                correct: 1
+            },
+            {
+                question: "Apa yang lebih berharga dari kata 'I Love You'?",
+                options: [
+                    "Cincin berlian 💍",
+                    "Tindakan nyata yang konsisten ✨",
+                    "Chat romantis setiap hari 💌",
+                    "Update status couple 📱"
+                ],
+                correct: 1
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let answered = false;
+
+        // Create stars
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < 150; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Create floating hearts
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            const hearts = ['❤️', '💕', '💖', '💗', '💓', '💝'];
+            heart.innerHTML = hearts[Math.floor(Math.random() * hearts.length)];
+            heart.style.left = Math.random() * 100 + '%';
+            heart.style.animationDuration = (Math.random() * 3 + 4) + 's';
+            document.body.appendChild(heart);
+            
+            setTimeout(() => heart.remove(), 7000);
+        }
+
+        // Create rose petals
+        function createPetal() {
+            const petal = document.createElement('div');
+            petal.className = 'rose-petals';
+            petal.style.left = Math.random() * 100 + '%';
+            petal.style.animationDuration = (Math.random() * 3 + 5) + 's';
+            petal.style.animationDelay = Math.random() * 2 + 's';
+            document.body.appendChild(petal);
+            
+            setTimeout(() => petal.remove(), 8000);
+        }
+
+        setInterval(createHeart, 800);
+        setInterval(createPetal, 400);
+        createStars();
+
+        function startQuiz() {
+            document.getElementById('welcomeScreen').style.display = 'none';
+            document.getElementById('quizScreen').style.display = 'block';
+            showQuestion();
+        }
+
+        function showQuestion() {
+            answered = false;
+            const question = questions[currentQuestion];
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('questionNumber').textContent = `Pertanyaan ${currentQuestion + 1} dari ${questions.length}`;
+            document.getElementById('questionText').textContent = question.question;
+            
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.className = 'option-btn';
+                button.textContent = option;
+                button.onclick = () => selectAnswer(index);
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        function selectAnswer(selectedIndex) {
+            if (answered) return;
+            answered = true;
+
+            const question = questions[currentQuestion];
+            const buttons = document.querySelectorAll('.option-btn');
+            
+            if (selectedIndex === question.correct) {
+                buttons[selectedIndex].classList.add('correct');
+                score++;
+            } else {
+                buttons[selectedIndex].classList.add('wrong');
+                buttons[question.correct].classList.add('correct');
+            }
+
+            setTimeout(() => {
+                currentQuestion++;
+                if (currentQuestion < questions.length) {
+                    showQuestion();
+                } else {
+                    showResults();
+                }
+            }, 1500);
+        }
+
+        function showResults() {
+            document.getElementById('quizScreen').style.display = 'none';
+            document.getElementById('resultScreen').style.display = 'block';
+            
+            const percentage = Math.round((score / questions.length) * 100);
+            document.getElementById('scoreText').textContent = percentage + '%';
+            
+            let message, description;
+            
+            if (percentage === 100) {
+                message = "🌟 Perfect! Kamu Juara Romantis! 🌟";
+                description = "Wow! Kamu benar-benar paham arti cinta sejati! Kamu tahu bahwa cinta bukan tentang materi, tapi tentang perhatian, waktu, dan komitmen. Pasanganmu sangat beruntung punya kamu! 💖";
+            } else if (percentage >= 70) {
+                message = "💕 Hebat! Kamu Sangat Romantis! 💕";
+                description = "Kamu punya pemahaman yang baik tentang cinta! Kamu tahu bahwa hubungan yang sehat dibangun dari komunikasi dan kepercayaan. Terus pertahankan! ✨";
+            } else if (percentage >= 50) {
+                message = "💗 Bagus! Kamu Lumayan Romantis! 💗";
+                description = "Kamu di jalur yang benar! Terus belajar tentang arti cinta sejati. Ingat, cinta bukan tentang hadiah mahal, tapi tentang tindakan kecil yang konsisten! 🌹";
+            } else {
+                message = "💝 Ayo Semangat! Masih Bisa Belajar! 💝";
+                description = "Jangan khawatir! Cinta adalah perjalanan belajar. Yang penting adalah niat baik dan keinginan untuk menjadi lebih baik. Coba lagi dan pelajari lebih dalam tentang arti cinta sejati! 💪";
+            }
+            
+            document.getElementById('resultMessage').textContent = message;
+            document.getElementById('resultDescription').textContent = description;
+        }
+
+        function showLoveLetter() {
+            document.getElementById('resultScreen').style.display = 'none';
+            document.getElementById('loveLetterScreen').style.display = 'block';
+        }
+
+        function resetQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            document.getElementById('loveLetterScreen').style.display = 'none';
+            document.getElementById('resultScreen').style.display = 'none';
+            document.getElementById('welcomeScreen').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
